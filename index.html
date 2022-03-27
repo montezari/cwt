@@ -1,0 +1,73 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Data Logger - Duta Soft</title>
+	<link href="style.css" rel="stylesheet" type="text/css">
+	<!--[if lte IE 8]><script language="javascript" type="text/javascript" src="excanvas.min.js"></script><![endif]-->
+	<script language="javascript" type="text/javascript" src="jquery.js"></script>
+	<script language="javascript" type="text/javascript" src="jquery.flot.js"></script>
+	<script language="javascript" type="text/javascript" src="jquery.flot.time.js"></script>
+	<script type="text/javascript">
+	$(function() {
+		var options = {
+			lines: {
+				show: true
+			},
+			points: {
+				show: false
+			},
+			xaxis: {
+				mode: "time",
+				minTickSize: [1, "hour"],
+				timeformat: "%H:%I"
+			}
+		};
+
+		var data = [];
+		$.plot("#placeholder", data, options);
+		var alreadyFetched = {};
+		$("button.fetchSeries").click(function () {
+			var button = $(this);
+			var dataurl = button.siblings("a").attr("href");
+			function onDataReceived(series) {
+				var firstcoordinate = "(" + series.data[0][0] + ", " + series.data[0][1] + ")";
+				button.siblings("span").text("Info : " + series.label);
+				if (!alreadyFetched[series.label]) {
+					alreadyFetched[series.label] = true;
+					data.push(series);
+				}
+				$.plot("#placeholder", data, options);
+			}
+			$.ajax({
+				url: dataurl,
+				type: "GET",
+				dataType: "json",
+				success: onDataReceived
+			});
+		});
+
+		$("button.fetchSeries:first").click();
+	});
+	</script>
+</head>
+<body>
+	<div id="header">
+		<h2>Data Logger - Duta Soft</h2>
+	</div>
+	<div id="content">
+		<div class="demo-container">
+			<div id="placeholder" class="demo-placeholder"></div>
+		</div>
+		<p>
+			<button class="fetchSeries">Refresh</button>
+			[ <a href="data.php">Lihat Data</a> ]
+			[ <a href="download.php">Download</a> ]
+			<span></span>
+		</p>
+	</div>
+	<div id="footer">
+		Copyright &copy; 2013 PT. Duta Cipta Solusindo
+	</div>
+</body>
+</html>

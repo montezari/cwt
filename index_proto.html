@@ -1,0 +1,162 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>DutaSOFT</title>
+	<link href="style.css" rel="stylesheet" type="text/css">
+	<!--[if lte IE 8]><script language="javascript" type="text/javascript" src="excanvas.min.js"></script><![endif]-->
+	<script language="javascript" type="text/javascript" src="jquery.js"></script>
+	<script language="javascript" type="text/javascript" src="jquery.flot.js"></script>
+	<script language="javascript" type="text/javascript" src="jquery.flot.time.js"></script>
+	<script type="text/javascript">
+	$(function() {
+		
+		var det = [
+			[Date.UTC(2011, 2, 12, 14, 0, 0), 26],
+			[Date.UTC(2011, 2, 12, 15, 0, 0), 26.5],
+			[Date.UTC(2011, 2, 12, 16, 0, 0), 25],
+			[Date.UTC(2011, 2, 12, 17, 0, 0), 24],
+			[Date.UTC(2011, 2, 12, 18, 0, 0), 23],
+			[Date.UTC(2011, 2, 12, 19, 0, 0), 23.5],
+			[Date.UTC(2011, 2, 12, 20, 0, 0), 22],
+			[Date.UTC(2011, 2, 12, 21, 0, 0), 21],
+			[Date.UTC(2011, 2, 12, 22, 0, 0), 19.5],
+			[Date.UTC(2011, 2, 12, 23, 0, 0), 18],
+			[Date.UTC(2011, 2, 13, 0, 0, 0), 15],
+			[Date.UTC(2011, 2, 13, 1, 0, 0), 16],
+			[Date.UTC(2011, 2, 13, 2, 0, 0), 17.5],
+			[Date.UTC(2011, 2, 13, 3, 0, 0), 18],
+			[Date.UTC(2011, 2, 13, 4, 0, 0), 18.5],
+			[Date.UTC(2011, 2, 13, 5, 0, 0), 18],
+			[Date.UTC(2011, 2, 13, 6, 0, 0), 19],
+			[Date.UTC(2011, 2, 13, 7, 0, 0), 19],
+			[Date.UTC(2011, 2, 13, 8, 0, 0), 20],
+			[Date.UTC(2011, 2, 13, 9, 0, 0), 23],
+			[Date.UTC(2011, 2, 13, 10, 0, 0), 24],
+			[Date.UTC(2011, 2, 13, 11, 0, 0), 26],
+			[Date.UTC(2011, 2, 13, 12, 0, 0), 29.5],
+			[Date.UTC(2011, 2, 13, 13, 0, 0), 29],
+			[Date.UTC(2011, 2, 13, 14, 0, 0), 28],
+			[Date.UTC(2011, 2, 13, 15, 0, 0), 27],
+			[Date.UTC(2011, 2, 13, 16, 0, 0), 25],
+			[Date.UTC(2011, 2, 13, 17, 0, 0), 23],
+			[Date.UTC(2011, 2, 13, 18, 0, 0), 22],
+			[Date.UTC(2011, 2, 13, 19, 0, 0), 23],
+			[Date.UTC(2011, 2, 13, 20, 0, 0), 21],
+			[Date.UTC(2011, 2, 13, 21, 0, 0), 20],
+			[Date.UTC(2011, 2, 13, 22, 0, 0), 22.5],
+			[Date.UTC(2011, 2, 13, 23, 0, 0), 20]
+		];
+
+		var plot = $.plot("#placeholderUTC", [det], {
+			xaxis: {
+				mode: "time"
+			}
+		});
+
+
+	
+		var d = [
+		[1196463600000, 24], [1196550000000, 23], [1196636400000, 20], [1196722800000, 17], [1196809200000, 24], [1196895600000, 27], [1196982000000, 27], [1197068400000, 22], [1197154800000, 25], [1197241200000, 15], [1197327600000, 24], [1197414000000, 25], [1197500400000, 26], [1197586800000, 21], [1197673200000, 23], [1197759600000, 19], [1197846000000, 30], [1197932400000, 27], [1198018800000, 23], [1198105200000, 21], [1198191600000, 29], [1198278000000, 18], [1198364400000, 16], [1198450800000, 19], [1198537200000, 25], [1198623600000, 23], [1198710000000, 29]
+		];
+
+		for (var i = 0; i < d.length; ++i) {
+			d[i][0] += 60 * 60 * 1000;
+		}
+
+		function weekendAreas(axes) {
+
+			var markings = [],
+				d = new Date(axes.xaxis.min);
+
+			d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 1) % 7))
+			d.setUTCSeconds(0);
+			d.setUTCMinutes(0);
+			d.setUTCHours(0);
+
+			var i = d.getTime();
+
+			do {
+				markings.push({ xaxis: { from: i, to: i + 2 * 24 * 60 * 60 * 1000 } });
+				i += 7 * 24 * 60 * 60 * 1000;
+			} while (i < axes.xaxis.max);
+
+			return markings;
+		}
+
+		var options = {
+			xaxis: {
+				mode: "time",
+				tickLength: 5
+			},
+			selection: {
+				mode: "x"
+			},
+			grid: {
+				markings: weekendAreas
+			}
+		};
+
+		var plot = $.plot("#placeholder", [d], options);
+
+		var overview = $.plot("#overview", [d], {
+			series: {
+				lines: {
+					show: true,
+					lineWidth: 1
+				},
+				shadowSize: 0
+			},
+			xaxis: {
+				ticks: [],
+				mode: "time"
+			},
+			yaxis: {
+				ticks: [],
+				min: 0,
+				autoscaleMargin: 0.1
+			},
+			selection: {
+				mode: "x"
+			}
+		});
+
+		$("#placeholder").bind("plotselected", function (event, ranges) {
+
+			plot = $.plot("#placeholder", [d], $.extend(true, {}, options, {
+				xaxis: {
+					min: ranges.xaxis.from,
+					max: ranges.xaxis.to
+				}
+			}));
+
+			overview.setSelection(ranges, true);
+		});
+
+		$("#overview").bind("plotselected", function (event, ranges) {
+			plot.setSelection(ranges);
+		});
+
+	});
+	</script>
+</head>
+<body>
+	<div id="header">
+		<h2>Duta Data Logger</h2>
+	</div>
+	<div id="content">
+	    <div><h3>26 Desember 2013</h3></div><div style="float:right; margin-top:-25px;margin-right:10px;"><button class="fetchSeries">Export Data</button></div>
+		<div class="demo-container" style="height: 250px;">
+			<div id="placeholderUTC" class="demo-placeholder"></div>
+		</div>
+		<h3>Desember 2013</h3>
+		<div class="demo-container" style="height: 250px;">
+			<div id="placeholder" class="demo-placeholder"></div>
+		</div>
+
+	</div>
+	<div id="footer">
+		Copyright &copy; 2013 PT. Duta Cipta Solusindo - DutaSOFT
+	</div>
+</body>
+</html>
